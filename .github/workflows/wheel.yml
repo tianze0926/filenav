@@ -9,9 +9,6 @@ jobs:
     permissions:
       # IMPORTANT: this permission is mandatory for Trusted Publishing
       id-token: write
-    defaults:
-      run:
-        working-directory: ./backend
     steps:
       - uses: actions/checkout@v4
       - run: |
@@ -19,6 +16,7 @@ jobs:
           CONDA_PATH="${HOME}/conda"
           bash Miniforge3.sh -b -p "${CONDA_PATH}"
           source "${CONDA_PATH}/etc/profile.d/conda.sh"
+          cd backend
           conda env create -f environment.yml -n env -y
           conda activate env
 
@@ -34,3 +32,5 @@ jobs:
           path: backend/dist/
       - if: github.ref_type == 'tag'
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: backend/dist/
