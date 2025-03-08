@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling", "versioningit"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "versioningit"
+
+[project]
+name = "filenav"
+dynamic = ["version"]
+dependencies = [
+    "fastapi[standard]",
+    "av",
+    "pillow",
+]
+
+[project.optional-dependencies]
+dev = [
+    "build",
+]
+
+[project.scripts]
+filenav = "filenav:run"

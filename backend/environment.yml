@@ -1,0 +1,10 @@
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - nodejs
+  - pip
+  - pip:
+      - fastapi[standard]
+      - av
+      - pillow
