@@ -13,5 +13,5 @@ def run():
     global app
     app = _app
 
-    sys.argv = ["uvicorn", "visualizer_web:app", "--app-dir", ".."] + sys.argv[1:]
+    sys.argv = ["uvicorn", "filenav:app", "--app-dir", ".."] + sys.argv[1:]
     sys.exit(uvicorn.main())
