@@ -24,3 +24,6 @@ dev = [
 
 [project.scripts]
 filenav = "filenav:run"
+
+[project.urls]
+Repository = "https://github.com/tianze0926/filenav"
