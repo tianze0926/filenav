@@ -78,7 +78,7 @@ npm run generate-client
 ### Run
 
 ```sh
-cd $PROJECT_DIR/backend/visualizer_web
+cd $PROJECT_DIR/backend/filenav
 fastapi dev main.py --port 50052
 ```
 

@@ -5,6 +5,9 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "versioningit"
 
+[tool.versioningit.vcs]
+default-tag = "v0.0.0"
+
 [project]
 name = "filenav"
 dynamic = ["version"]
@@ -21,3 +24,6 @@ dev = [
 
 [project.scripts]
 filenav = "filenav:run"
+
+[project.urls]
+Repository = "https://github.com/tianze0926/filenav"

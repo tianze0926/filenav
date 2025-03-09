@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      # IMPORTANT: this permission is mandatory for Trusted Publishing
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          curl -fsSLo Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+          CONDA_PATH="${HOME}/conda"
+          bash Miniforge3.sh -b -p "${CONDA_PATH}"
+          source "${CONDA_PATH}/etc/profile.d/conda.sh"
+          cd backend
+          conda env create -f environment.yml -n env -y
+          conda activate env
+
+          cd ../frontend
+          npm install
+          npm run build
+
+          cd ../backend
+          pip install build twine
+          python -m build
+      - uses: actions/upload-artifact@v4
+        with:
+          path: backend/dist/
+      - if: github.ref_type == 'tag'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: backend/dist/
