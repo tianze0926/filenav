@@ -61,6 +61,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/setup-buildx-action@v3
+      - uses: actions/download-artifact@v4
+      - run: |
+          tree
       - uses: docker/build-push-action@v6
         with:
           push: ${{ github.ref_type == 'tag' }}
