@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-COPY artifact/ /artifact/
+COPY artifact/ /opt/
 
 RUN cd /artifact &&\
     mv *.whl wheel.whl &&\
