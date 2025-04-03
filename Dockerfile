@@ -3,8 +3,7 @@ FROM python:3.12-slim
 COPY artifact/ /artifact/
 
 RUN cd /artifact &&\
-    mv *.whl wheel.whl &&\
-    pip install --no-cache-dir --no-compile wheel.whl &&\
+    pip install --no-cache-dir --no-compile *.whl &&\
     cd / &&\
     rm -rf /artifact
 
