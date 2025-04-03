@@ -7,11 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "generate-client": "openapi-ts --input http://localhost:50052/api/openapi.json --output ./src/client --client @hey-api/client-fetch"
+    "generate-client": "openapi-ts"
   },
   "license": "MIT",
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.53.8",
+    "@hey-api/openapi-ts": "^0.64.1",
     "autoprefixer": "^10.4.20",
     "daisyui": "^4.12.10",
     "postcss": "^8.4.41",
@@ -21,7 +21,7 @@
     "vite-plugin-solid": "^2.8.2"
   },
   "dependencies": {
-    "@hey-api/client-fetch": "^0.4.0",
+    "@hey-api/client-fetch": "^0.8.1",
     "@solid-primitives/resource": "^0.3.1",
     "@tanstack/solid-virtual": "^3.10.6",
     "solid-js": "^1.8.11"

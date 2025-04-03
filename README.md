@@ -64,6 +64,14 @@ conda activate filenav
 cd $PROJECT_DIR/frontend
 # npm would be already installed with conda from backend env
 npm install
+npm run build # backend relies on frontend dist
+```
+
+### Run Backend
+
+```sh
+cd $PROJECT_DIR/backend/filenav
+fastapi dev main.py --port 50052
 ```
 
 ### (Optional) Generate Client Code
@@ -75,12 +83,7 @@ cd $PROJECT_DIR/frontend
 npm run generate-client
 ```
 
-### Run
-
-```sh
-cd $PROJECT_DIR/backend/filenav
-fastapi dev main.py --port 50052
-```
+### Run Frontend
 
 ```sh
 cd $PROJECT_DIR/frontend

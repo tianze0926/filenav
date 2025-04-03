@@ -8,86 +8,50 @@ import {
 } from "solid-js";
 import { Column } from "./Column";
 import { FilePreview } from "./FilePreview";
-import { client, ItemInfo, itemItemGet } from "./client";
+import { client, ItemInfo, itemItemGet, DirItem, Error } from "./client";
 import naturalCompare from "./naturalCompare";
-
-client.setConfig({ baseUrl: "/api" });
-
-class DirCache {
-  map = new Map<string, string>();
-  get(key: Path) {
-    return this.map.get(key.str());
-  }
-  set(p: Path) {
-    const name = p.name();
-    if (name) this.map.set(p.parent().str(), name);
-  }
-}
+import { Path, DirCache } from "./utils";
+import { StatBar } from "./StatBar";
 
 // TODO: should be a signal
 const dirCache = new DirCache();
 
+client.setConfig({ baseUrl: "/api" });
+
 type Data = ItemInfo & {
   indexes: { current: number; parent: number; preview: number };
 };
-const fallback = {
+const fallback: Data = {
   current: [],
   parent: [],
-  is_dir: true,
+  file_info: { type: "error", msg: "" },
   preview: [],
   indexes: { current: -1, parent: -1, preview: -1 },
 };
 
-class Path {
-  parts: string[];
-  constructor(path_or_parts: string | string[]) {
-    if (!Array.isArray(path_or_parts)) path_or_parts = path_or_parts.split("/");
-    this.parts = path_or_parts.filter((p) => p.length > 0);
-  }
-  str() {
-    return "/" + this.parts.join("/");
-  }
-  name() {
-    return this.parts.at(-1);
-  }
-  parent() {
-    return new Path(this.parts.slice(0, -1));
-  }
-  join(name: string) {
-    return new Path(this.parts.concat(new Path(name).parts));
-  }
-  to_uri() {
-    return "/" + this.parts.map(encodeURIComponent).join("/");
-  }
-  static from_uri() {
-    const pathname = window.location.pathname;
-    return new Path(pathname.split("/").map(decodeURIComponent));
-  }
-}
-
 // TODO: abort
 async function getData(path: Path): Promise<Data> {
-  const result = await itemItemGet({ query: { item: path.str() } });
-  if (typeof result.error !== "undefined") return fallback;
+  const result = await itemItemGet({ query: { item: path.toString() } });
+  if (typeof result.error !== "undefined") throw result.error;
   const data = result.data;
   for (const array of [data.parent, data.current, data.preview]) {
+    if (!Array.isArray(array)) continue;
     // TODO: other sorting
     array.sort((a, b) => naturalCompare(a.path, b.path));
   }
-  const findIndex = (current: boolean) =>
-    data[current ? "current" : "parent"].findIndex(
-      (e) => e.path === (current ? path : path.parent()).name()
-    );
+  const findIndex = (col: DirItem[] | Error, name: string) => {
+    if (!Array.isArray(col)) return -1;
+    return col.findIndex((e) => e.path === name);
+  };
   return {
     ...data,
     indexes: {
-      current: findIndex(true),
-      parent: findIndex(false),
+      current: findIndex(data.current, path.name()),
+      parent: findIndex(data.parent, path.parent().name()),
       preview: (() => {
         const cachedName = dirCache.get(path);
-        console.log(cachedName === "");
         if (typeof cachedName === "undefined") return 0;
-        return data.preview.findIndex((e) => e.path == cachedName);
+        return findIndex(data.preview, cachedName);
       })(),
     },
   };
@@ -103,21 +67,28 @@ const App: Component = () => {
     dirCache.set(currentPath);
   });
   const [data] = createResource(current, getData, { initialValue: fallback });
-  createEffect(() => {
-    console.log(data());
-  });
+  const currentIsDir = () => {
+    const item = data().file_info;
+    if (item.type == "error") return true;
+    if (item.stat.type == "error") return true;
+    return item.stat.is_dir;
+  };
   function shiftIndex(offset: number) {
+    const currentCol = data().current;
+    if (!Array.isArray(currentCol)) return;
     const targetIndex = data().indexes.current + offset;
     const trimmedIndex = Math.min(
       Math.max(0, targetIndex),
-      data().current.length - 1
+      currentCol.length - 1
     );
-    const targetName = data().current[trimmedIndex];
+    const targetName = currentCol[trimmedIndex];
     if (typeof targetName === "undefined") return;
     setCurrent(current().parent().join(targetName.path));
   }
   function enter() {
-    const nextName = data().preview[data().indexes.preview];
+    const previewCol = data().preview;
+    if (!Array.isArray(previewCol)) return;
+    const nextName = previewCol[data().indexes.preview];
     if (typeof nextName === "undefined") return;
     setCurrent(current().join(nextName.path));
   }
@@ -130,7 +101,6 @@ const App: Component = () => {
   const [play, setPlay] = createSignal(undefined, { equals: false });
 
   onkeydown = (event) => {
-    console.log(event);
     switch (event.key) {
       case "j":
       case "ArrowDown":
@@ -148,7 +118,7 @@ const App: Component = () => {
         break;
       case "l":
       case "ArrowRight":
-        if (data().is_dir) enter();
+        if (currentIsDir()) enter();
         else setPlay();
         break;
       case "h":
@@ -162,7 +132,7 @@ const App: Component = () => {
   };
   return (
     <div class="h-screen p-2 flex flex-col">
-      <div>{current().str()}</div>
+      <div>{current().toString()}</div>
       <div class="min-h-0 grow flex items-stretch">
         <Column
           items={data().parent}
@@ -177,12 +147,17 @@ const App: Component = () => {
         ></Column>
         <div class="w-[4%] m-0 divider divider-horizontal"></div>
         <Show
-          when={data().is_dir}
+          when={currentIsDir()}
           fallback={
-            <Show when={data().current[data().indexes.current]}>
+            <Show
+              when={((col: DirItem[] | Error) =>
+                Array.isArray(col) ? col[data().indexes.current] : null)(
+                data().current
+              )}
+            >
               {(file) => (
                 <FilePreview
-                  file={{ ...file(), path: untrack(current).to_uri() }}
+                  file={{ ...file(), path: untrack(current) }}
                   play={play()}
                 ></FilePreview>
               )}
@@ -196,6 +171,7 @@ const App: Component = () => {
           ></Column>
         </Show>
       </div>
+      <StatBar file_info={data().file_info} />
     </div>
   );
 };
