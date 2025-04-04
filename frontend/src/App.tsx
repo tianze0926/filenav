@@ -12,6 +12,7 @@ import { client, ItemInfo, itemItemGet, DirItem, Error } from "./client";
 import naturalCompare from "./naturalCompare";
 import { Path, DirCache } from "./utils";
 import { StatBar } from "./StatBar";
+import { makePersisted } from "@solid-primitives/storage";
 
 // TODO: should be a signal
 const dirCache = new DirCache();
@@ -58,12 +59,13 @@ async function getData(path: Path): Promise<Data> {
 }
 
 const App: Component = () => {
-  const [current, setCurrent] = createSignal(Path.from_uri());
+  const [current, setCurrent] = makePersisted(createSignal(new Path("/")), {
+    name: "path",
+    serialize: (p) => p.toString(),
+    deserialize: (s) => new Path(s),
+  });
   createEffect(() => {
     const currentPath = current();
-    const pathname = currentPath.to_uri();
-    if (window.location.pathname !== pathname)
-      window.history.pushState(undefined, "", pathname);
     dirCache.set(currentPath);
   });
   const [data] = createResource(current, getData, { initialValue: fallback });
@@ -130,22 +132,38 @@ const App: Component = () => {
     }
     event.preventDefault();
   };
+  let inputPath: HTMLInputElement;
   return (
     <div class="h-screen p-2 flex flex-col">
-      <div>{current().toString()}</div>
+      <form
+        class="join mb-1"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const v = inputPath!.value;
+          if (v) setCurrent(new Path(v));
+        }}
+      >
+        <input
+          type="text"
+          class="join-item input grow"
+          ref={inputPath!}
+          value={current().toString()}
+        />
+        <button class="join-item btn">Go</button>
+      </form>
       <div class="min-h-0 grow flex items-stretch">
         <Column
           items={data().parent}
           currentIndex={data().indexes.parent}
           set={set(untrack(current).parent().parent())}
         ></Column>
-        <div class="w-[4%] m-0 divider divider-horizontal"></div>
+        <div class="!w-[2%] m-0 divider divider-horizontal"></div>
         <Column
           items={data().current}
           currentIndex={data().indexes.current}
           set={set(untrack(current).parent())}
         ></Column>
-        <div class="w-[4%] m-0 divider divider-horizontal"></div>
+        <div class="!w-[2%] m-0 divider divider-horizontal"></div>
         <Show
           when={currentIsDir()}
           fallback={

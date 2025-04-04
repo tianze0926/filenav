@@ -38,7 +38,7 @@ export const Column: Component<{
       _ctx.virtualizer.scrollToIndex(props.currentIndex, { align: "center" });
   });
   return (
-    <div class="w-[30%] flex flex-col">
+    <div class="w-[32%] flex flex-col">
       <Switch>
         <Match
           when={(() => {

@@ -30,8 +30,4 @@ export class Path {
   to_uri() {
     return "/" + this.parts.map(encodeURIComponent).join("/");
   }
-  static from_uri() {
-    const pathname = window.location.pathname;
-    return new Path(pathname.split("/").map(decodeURIComponent));
-  }
 }
