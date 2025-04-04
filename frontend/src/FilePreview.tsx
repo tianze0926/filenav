@@ -8,6 +8,7 @@ import {
 } from "solid-js";
 import { DirItem } from "./client";
 import { Path } from "./utils";
+import { makePersisted } from "@solid-primitives/storage";
 
 const openUrlScheme: Record<string, (url: string) => string> = {
   IINA: (url) => `iina://weblink?${new URLSearchParams({ url: url })}`,
@@ -23,17 +24,12 @@ export const FilePreview: Component<{
     return mime.split("/")[0];
   };
   const url = () => "/api/file" + props.file.path.to_uri();
-  const urlSchemeKey = "urlSchemeKey";
-  const [urlScheme, setUrlScheme] = createSignal(
-    localStorage.getItem(urlSchemeKey) || ""
-  );
-  createEffect(() => {
-    const v = urlScheme();
-    if (v) localStorage.setItem(urlSchemeKey, v);
+  const [urlScheme, setUrlScheme] = makePersisted(createSignal(""), {
+    name: "urlScheme",
   });
 
   return (
-    <div class="w-[30%] flex flex-col space-y-1">
+    <div class="w-[32%] flex flex-col space-y-1">
       <div class="flex mb-1">
         <button
           class="btn mr-1"

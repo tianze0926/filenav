@@ -39,11 +39,10 @@ filenav --uds /tmp/vis.sock
 
 ## Usage
 
-- The path can be controlled using either:
-  - url: for example `http://127.0.0.1:1234/home/abc`
-  - navigation within the web app, by either:
-    - clicking any file or directory using mouse
-    - pressing arrow keys or common vim key bindings
+- The path can be controlled by either:
+  - editing the path in the top bar
+  - clicking any file or directory using mouse
+  - pressing arrow keys or common vim key bindings
 
 ## Development
 
