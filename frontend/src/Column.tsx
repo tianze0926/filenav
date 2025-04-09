@@ -1,5 +1,4 @@
 import {
-  createMemo,
   type Component,
   Index,
   createEffect,
@@ -32,10 +31,12 @@ export const Column: Component<{
           type: "err" as "err",
           err: props.items,
         };
-  createEffect(() => {
+  createEffect(async () => {
     const _ctx = ctx();
-    if (_ctx.type == "col")
+    if (_ctx.type == "col") {
+      await Promise.resolve(); // wait for browser rendering
       _ctx.virtualizer.scrollToIndex(props.currentIndex, { align: "center" });
+    }
   });
   return (
     <div class="w-[32%] flex flex-col">
