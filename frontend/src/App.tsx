@@ -59,14 +59,18 @@ async function getData(path: Path): Promise<Data> {
 }
 
 const App: Component = () => {
-  const [current, setCurrent] = makePersisted(createSignal(new Path("/")), {
-    name: "path",
-    serialize: (p) => p.toString(),
-    deserialize: (s) => new Path(s),
-  });
+  const pathQuery = "path";
+  const [current, setCurrent] = createSignal(
+    new Path(
+      new URL(window.location.toString()).searchParams.get(pathQuery) || "/"
+    )
+  );
   createEffect(() => {
     const currentPath = current();
     dirCache.set(currentPath);
+    let url = new URL(window.location.toString());
+    url.searchParams.set(pathQuery, currentPath.toString());
+    window.history.pushState(undefined, "", url);
   });
   const [data] = createResource(current, getData, { initialValue: fallback });
   const currentIsDir = () => {
