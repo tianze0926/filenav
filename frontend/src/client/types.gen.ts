@@ -50,22 +50,22 @@ export type ItemItemGetResponse = (ItemInfo);
 
 export type ItemItemGetError = (HTTPValidationError);
 
-export type FileFileFilePathGetData = {
-    path: {
-        file_path: string;
+export type FileFileGetData = {
+    query: {
+        path: string;
     };
 };
 
-export type FileFileFilePathGetResponse = (unknown);
+export type FileFileGetResponse = (unknown);
 
-export type FileFileFilePathGetError = (HTTPValidationError);
+export type FileFileGetError = (HTTPValidationError);
 
-export type ThumbnailThumbnailFilePathGetData = {
-    path: {
-        file_path: string;
+export type ThumbnailThumbnailGetData = {
+    query: {
+        path: string;
     };
 };
 
-export type ThumbnailThumbnailFilePathGetResponse = (unknown);
+export type ThumbnailThumbnailGetResponse = (unknown);
 
-export type ThumbnailThumbnailFilePathGetError = (HTTPValidationError);
+export type ThumbnailThumbnailGetError = (HTTPValidationError);

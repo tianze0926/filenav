@@ -27,7 +27,4 @@ export class Path {
   join(name: string) {
     return new Path(this.parts.concat(new Path(name).parts));
   }
-  to_uri() {
-    return "/" + this.parts.map(encodeURIComponent).join("/");
-  }
 }

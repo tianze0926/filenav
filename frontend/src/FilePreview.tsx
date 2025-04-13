@@ -23,7 +23,11 @@ export const FilePreview: Component<{
     const mime = props.file.mime;
     return mime.split("/")[0];
   };
-  const url = () => "/api/file" + props.file.path.to_uri();
+  const searchParams = () =>
+    new URLSearchParams({
+      path: props.file.path.toString(),
+    });
+  const url = () => "/api/file?" + searchParams();
   const [urlScheme, setUrlScheme] = makePersisted(createSignal(""), {
     name: "urlScheme",
   });
@@ -50,18 +54,15 @@ export const FilePreview: Component<{
           </For>
         </select>
       </div>
-      <Switch
-        fallback={
-          <div>
-            file:{" "}
-            <a href={url()} target="_blank" class="link">
-              {props.file.path.toString()}
-            </a>
-          </div>
-        }
-      >
+      <div>
+        Download:{" "}
+        <a href={url()} target="_blank" class="link">
+          {props.file.path.toString()}
+        </a>
+      </div>
+      <Switch>
         <Match when={mime() == "video"}>
-          <img src={"/api/thumbnail" + props.file.path}></img>
+          <img src={"/api/thumbnail?" + searchParams()}></img>
           <video controls preload="none" src={url()}></video>
         </Match>
         <Match when={mime() == "audio"}>
