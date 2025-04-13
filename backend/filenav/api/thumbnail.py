@@ -40,9 +40,9 @@ def seek(video_path: str) -> Image.Image:
     raise AssertionError()
 
 
-@api.get("/thumbnail/{file_path:path}")
-def thumbnail(file_path: str) -> StreamingResponse:
-    img = seek("/" + file_path)
+@api.get("/thumbnail")
+def thumbnail(path: str) -> StreamingResponse:
+    img = seek(path)
     buffer = io.BytesIO()
     img.save(buffer, "png")
     buffer.seek(0)
