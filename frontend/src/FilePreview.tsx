@@ -33,10 +33,18 @@ export const FilePreview: Component<{
   });
 
   return (
-    <div class="w-[32%] flex flex-col space-y-1">
-      <div class="flex mb-1">
+    <div class="w-[32%] flex flex-col gap-1 overflow-auto">
+      <div class="flex gap-1">
+        <a href={url()} target="_blank" class="btn grow">
+          Open in new tab
+        </a>
+        <a href={url()} download class="btn grow">
+          Download
+        </a>
+      </div>
+      <div class="flex gap-1">
         <button
-          class="btn mr-1"
+          class="btn grow"
           onclick={() => {
             const fn = openUrlScheme[urlScheme()];
             if (fn) location.href = fn(location.origin + url());
@@ -45,7 +53,7 @@ export const FilePreview: Component<{
           Open using:{" "}
         </button>
         <select
-          class="select"
+          class="select grow"
           value={urlScheme()}
           onChange={(e) => setUrlScheme(e.target.value)}
         >
@@ -53,12 +61,6 @@ export const FilePreview: Component<{
             {(item, index) => <option>{item}</option>}
           </For>
         </select>
-      </div>
-      <div>
-        Download:{" "}
-        <a href={url()} target="_blank" class="link">
-          {props.file.path.toString()}
-        </a>
       </div>
       <Switch>
         <Match when={mime() == "video"}>
