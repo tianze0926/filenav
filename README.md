@@ -2,6 +2,8 @@
 
 This is a file browsing web app, inspired by terminal file managers like [lf](https://github.com/gokcehan/lf) and [yazi](https://github.com/sxyazi/yazi).
 
+![demo](assets/demo.png)
+
 ### Features
 
 - Multi-column layout
