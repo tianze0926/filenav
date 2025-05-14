@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Any, Literal
 from pathlib import Path
 import mimetypes
 import os
@@ -56,16 +56,20 @@ def name_from_id(uid_gid: int, is_uid: bool):
         return str(uid_gid)
 
 
+def str_surrogate(obj: Any) -> str:
+    return str(obj).encode(errors="backslashreplace").decode()
+
+
 def get_dir_item(file: Path):
     try:
         stat = file.stat()
         stat = Stat.from_stat(stat)
     except Exception as e:
-        stat = Error(msg=str(e))
+        stat = Error(msg=str_surrogate(e))
     return DirItem(
-        path=str(file.name),
+        path=str_surrogate(file.name),
         mime=mimetypes.guess_type(file)[0] or "",
-        symlink=str(file.readlink()) if file.is_symlink() else "",
+        symlink=str_surrogate(file.readlink()) if file.is_symlink() else "",
         stat=stat,
     )
 
